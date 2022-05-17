@@ -59,17 +59,5 @@ const getUrl = async function(req, res){
     catch(error){res.status(500).send({status:false, message:error.message})}
     }
 
-// const getUrl = async (req, res) => {
-//     try {
-//       let urlCode = req.params.urlCode;
-  
-//       let getUrl = await urlModel.findOne({ urlCode: urlCode })
-//       if(!getUrl) return res.status(404).send({ status: false, message: 'Url-code not found' });
-  
-//       res.status(303).redirect(getUrl.longUrl)
-//     } catch (err) {
-//       res.status(500).send({ status: false, error: err.message });
-//     }
-//   }
-  
+
 module.exports = { CreateShortUrl,getUrl }
