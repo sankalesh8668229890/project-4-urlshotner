@@ -8,7 +8,7 @@ const baseUrl = 'http://localhost:3000'
 const CreateShortUrl = async function (req, res) {
     try {
         let body = req.body
-        let longUrl = body.longUrl.toLowerCase()
+        // let longUrl = body.longUrl
 
 
         if (Object.keys(body).length === 0) {
@@ -22,19 +22,22 @@ const CreateShortUrl = async function (req, res) {
             return res.status(400).send({ status: false, message: "Looks like not a valid URL" })
         }
 
-        let FindUrl = await urlModel.findOne({ longUrl: longUrl }).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
+        let FindUrl = await urlModel.findOne({ longUrl: body.longUrl });  //.select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
 
         if (FindUrl) {
-            return res.status(400).send({ status: true, data: FindUrl })
+            return res.status(400).send({ status: false, message:"this urlcode is already generated" })
         }
-        const urlCode = shortid.generate()
+        const urlCode = shortid.generate().toLowerCase()
         let shortUrl = baseUrl + '/' + urlCode
 
-        url = { longUrl, shortUrl, urlCode }
+        // url = { longUrl, shortUrl, urlCode }
+        body.shortUrl = shortUrl
+        body.urlCode = urlCode
 
-        let createShort = await urlModel.create(url)
 
-        let ShowUrl = await urlModel.findOne({ longUrl: longUrl }).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
+        await urlModel.create(body)
+
+        let ShowUrl = await urlModel.findOne({ longUrl: body.longUrl }).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
 
         return res.status(201).send({ Status: true, data: ShowUrl })
 
@@ -47,11 +50,26 @@ const getUrl = async function(req, res){
     try{
         // url which comes in params 
         let urlCode = req.params.urlCode
+       
         let url = await urlModel.findOne({ urlCode : urlCode });
-        if (!url){ return res.status(400).send({status:false , message:'please enter url'})}
-        else{return res.status(200).send({status:true,data:url})}
+       
+        if (!url) return res.status(404).send({status:false , message:'url not found'})
+         res.status(303).redirect(url.longUrl)
     }
     catch(error){res.status(500).send({status:false, message:error.message})}
     }
 
+// const getUrl = async (req, res) => {
+//     try {
+//       let urlCode = req.params.urlCode;
+  
+//       let getUrl = await urlModel.findOne({ urlCode: urlCode })
+//       if(!getUrl) return res.status(404).send({ status: false, message: 'Url-code not found' });
+  
+//       res.status(303).redirect(getUrl.longUrl)
+//     } catch (err) {
+//       res.status(500).send({ status: false, error: err.message });
+//     }
+//   }
+  
 module.exports = { CreateShortUrl,getUrl }
