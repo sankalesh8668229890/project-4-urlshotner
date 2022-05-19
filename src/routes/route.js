@@ -6,7 +6,7 @@ const UrlController=require("../controller/UrlController")
 
 router.post("/url/shorten",UrlController.CreateShortUrl)
 
-router.get("/:urlCode",UrlController.getUrl)
+router.get("/:urlCode",UrlController.GetUrl)
 
 
 
