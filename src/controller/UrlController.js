@@ -4,8 +4,6 @@ const shortid = require("shortid");
 const redis = require("redis");
 const { promisify } = require("util");
 
-
-
 const redisClient = redis.createClient(
   15279,
   "redis-15279.c264.ap-south-1-1.ec2.cloud.redislabs.com",
@@ -77,13 +75,11 @@ const CreateShortUrl = async function (req, res) {
       .select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 });
 
     await SETEX_ASYNC(`${body.longUrl}`, 3600, JSON.stringify(ShowUrl));
-    res
-      .status(201)
-      .send({
-        status: true,
-        message: "URL create successfully",
-        body: shortUrl,
-      });
+    res.status(201).send({
+      status: true,
+      message: "URL create successfully",
+      body: shortUrl,
+    });
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
   }
@@ -92,9 +88,9 @@ const CreateShortUrl = async function (req, res) {
 const GetUrl = async function (req, res) {
   try {
     let getLongUrl = await GET_ASYNC(`${req.params.urlCode}`);
-    let url2 = JSON.parse(getLongUrl);
-    if (url2) {
-      return res.status(307).redirect(url2.longUrl);
+    let url = JSON.parse(getLongUrl);
+    if (url) {
+      return res.status(307).redirect(url.longUrl);
     } else {
       let getUrl = await urlModel.findOne({ urlCode: req.params.urlCode });
       if (!getUrl) {
@@ -102,9 +98,10 @@ const GetUrl = async function (req, res) {
           .status(404)
           .send({ status: false, message: "Url-Code not found" });
       }
+
+      await SETEX_ASYNC(`${req.params.urlCode}`, 3600, JSON.stringify(getUrl));
+      return res.status(307).redirect(getUrl.longUrl);
     }
-    await SETEX_ASYNC(`${req.params.urlCode}`, 3600, JSON.stringify(getUrl));
-    return res.status(307).redirect(getUrl.longUrl);
   } catch (error) {
     res.status(500).send({ status: false, message: error.message });
   }
