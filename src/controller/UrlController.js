@@ -78,7 +78,7 @@ const CreateShortUrl = async function (req, res) {
     res.status(201).send({
       status: true,
       message: "URL create successfully",
-      body: shortUrl,
+      data: ShowUrl,
     });
   } catch (err) {
     return res.status(500).send({ status: false, message: err.message });
