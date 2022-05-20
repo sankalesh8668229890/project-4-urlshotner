@@ -39,11 +39,11 @@ const CreateShortUrl = async function (req, res) {
       return res.status(400).send({ status: false, message: "Looks like not a valid URL" });
     }
 
-    // let getUrl = await GET_ASYNC(`${body.longUrl}`);
-    // let url = JSON.parse(getUrl);
-    // if (url) {
-    //   return res.status(200).send({ status: true, message: "success", data: url });
-    // }
+    let getUrl = await GET_ASYNC(`${body.longUrl}`);
+    let url = JSON.parse(getUrl);
+    if (url) {
+      return res.status(200).send({ status: true, message: "success", data: url });
+    }
 
     let FindUrl = await urlModel.findOne({ longUrl: body.longUrl }); //.select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
 
@@ -56,9 +56,9 @@ const CreateShortUrl = async function (req, res) {
 
     let shortUrl = baseUrl + "/" + urlCode;
 
-    url = { longUrl, shortUrl, urlCode }
-    // body.shortUrl = shortUrl;
-    // body.urlCode = urlCode;
+    // url = { longUrl, shortUrl, urlCode }
+    body.shortUrl = shortUrl;
+    body.urlCode = urlCode;
 
     await urlModel.create(url);
 
