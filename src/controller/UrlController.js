@@ -24,7 +24,7 @@ const SETEX_ASYNC = promisify(redisClient.SETEX).bind(redisClient);
 const CreateShortUrl = async function (req, res) {
   try {
     let body = req.body;
-    let longUrl = body.longUrl
+  //  let longUrl = body.longUrl
 
     if (Object.keys(body).length === 0) {
       return res.status(400).send({ status: false, message: "Please enter the data" });
